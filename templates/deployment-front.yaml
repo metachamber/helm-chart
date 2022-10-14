@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-front
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: {{ .Release.Name }}-front
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}-front
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}-front
+    spec:
+      containers:
+        - name: back
+          image: {{ .Values.front.image.name }}:{{ .Values.front.image.tag }}
+          env:
+          - name: BACKEND
+            {{ if (eq "-" .Values.front.config.backend) }}
+            value: {{ .Release.Name }}-back:8000
+            {{ else }}
+            value: {{ .Values.front.config.backend }}
+            {{ end }}
+          resources:
+            {{- toYaml .Values.front.resources | nindent 12 }}
+          livenessProbe:
+            exec:
+              command: ["service", "nginx", "status", "||", "exit", "1"]
+            initialDelaySeconds: 3
+            failureThreshold: 3
+            periodSeconds: 10
+            timeoutSeconds: 2

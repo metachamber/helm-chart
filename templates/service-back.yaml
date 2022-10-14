@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}-back
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: {{ .Release.Name }}-back
+spec:
+  selector:
+    app: {{ .Release.Name }}-back
+  ports:
+    - name: http
+      protocol: TCP
+      port: 8000
+      targetPort: 8000

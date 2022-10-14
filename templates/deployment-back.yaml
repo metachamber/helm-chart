@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-back
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: {{ .Release.Name }}-back
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}-back
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}-back
+      annotations:
+        {{- include "metachamber.configmapChecksum" . | nindent 8 }}
+        {{- include "metachamber.secretChecksum" . | nindent 8 }}
+    spec:
+      containers:
+        - name: back
+          image: {{ .Values.back.image.name }}:{{ .Values.back.image.tag }}
+          envFrom:
+            - configMapRef:
+                name: {{ .Release.Name }}
+            - secretRef:
+                name: {{ .Release.Name }}
+          resources:
+            {{- toYaml .Values.back.resources | nindent 12 }}
+          livenessProbe:
+            httpGet:
+              path: /health_check
+              port: 8000
+            initialDelaySeconds: 3
+            failureThreshold: 3
+            periodSeconds: 10
+            timeoutSeconds: 2

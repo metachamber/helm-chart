@@ -1,0 +1,56 @@
+logLevel: "INFO"
+
+back:
+  image:
+    name: metachamber/metachamber-back
+    tag: latest
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "128Mi"
+    limits:
+      cpu: "1"
+      memory: "1Gi"
+  replication: 1
+  config:
+    serviceWorkers: 1
+    secret: "s0oMeR4nDOm5tr1ng"
+    database:
+      host: postgres
+      port: 5432
+      name: metachamber
+      user: metachamber
+      password: metachamber
+
+front:
+  image:
+    name: metachamber/metachamber-front
+    tag: latest
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "128Mi"
+    limits:
+      cpu: "1"
+      memory: "1Gi"
+  replication: 1
+  config:
+    backend: "-"
+
+
+postgresql:
+  enabled: true
+  auth:
+    enablePostgresUser: false
+    username: metachamber
+    password: metachamber
+    database: metachamber
+  architecture: standalone
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "128Mi"
+    limits:
+      cpu: "1"
+      memory: "1Gi"
+
